@@ -1,4 +1,10 @@
 mod VersionPayload;
+mod neoi64;
+mod user_agent;
+mod Capability;
+mod Message;
+
+use user_agent::UserAgent;
 use VersionPayload::*;
 
 use std::collections::HashMap;
@@ -8,7 +14,7 @@ use reqwest::header::HeaderMap;
 use tokio::net::TcpStream;
 use tokio_native_tls::{TlsConnector, native_tls};
 use log::{info};
-
+use Message::Message as NEOMessage;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -16,10 +22,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Starting application.");
     // Connect to the server using plain TCP
-    let version = UserAgent::from("aaa".to_string());
+
+    let m = NEOMessage::new();
     let config = bincode::config::standard();
 
-    let v = bincode::encode_to_vec(version, config).unwrap();
+    let v = bincode::encode_to_vec(m, config).unwrap();
 
     // let stream = TcpStream::connect("localhost:10333").await?;
 
