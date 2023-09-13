@@ -16,21 +16,19 @@ use tokio_native_tls::{TlsConnector, native_tls};
 use log::{info};
 use Message::Message as NEOMessage;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+
+ fn main()  {
     env_logger::init();
 
     info!("Starting application.");
     // Connect to the server using plain TCP
 
     let m = NEOMessage::new();
-    let config = bincode::config::standard();
-
+    let mut config = bincode::config::standard().with_fixed_int_encoding();
+    println!("{:?}", m);
     let v = bincode::encode_to_vec(m, config).unwrap();
 
     // let stream = TcpStream::connect("localhost:10333").await?;
 
     println!("{:?}", v);
-
-    Ok(())
 }

@@ -1,10 +1,12 @@
 use bincode::*;
 use bincode::enc::Encoder;
 use bincode::error::EncodeError;
-use crate::Capability::Capability;
+use crate::Capability::{Capability, CapabilityType, FULL_NODE, FullCapability, TCP_SERVER, WS_SERVER};
 use crate::neoi64::NEOi64;
 use crate::user_agent::UserAgent;
-
+use std::time::*;
+use tokio::time;
+#[derive(Debug)]
 pub struct VersionPayload {
     network: u32,
     version: u32,
@@ -16,7 +18,13 @@ pub struct VersionPayload {
 
 impl VersionPayload {
     pub fn new() -> Self {
-        Self{network: 860833102, version: 0, timestamp: 1694537347, nonce: 1073020062, user_agent: "/Neo:3.6.0/".into(), capabilities: vec![Capability::new()]}
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
+        println!("stamp {:?}",now.as_secs());
+        Self{network: 5943216, version: 0, timestamp: 1694557199, nonce: 2100635172, user_agent: "/Neo:3.6.0/".into(), capabilities: vec![
+            FULL_NODE,
+            TCP_SERVER,
+            WS_SERVER
+        ]}
     }
 }
 
@@ -30,6 +38,7 @@ impl Encode for VersionPayload {
         let len = (self.capabilities.len() as i64);
         Encode::encode(&NEOi64::from(len), encoder)?;
         self.capabilities.iter().for_each(|item|{_ = Encode::encode(item, encoder);});
+
         Ok(())
     }
 }

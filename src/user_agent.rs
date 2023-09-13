@@ -2,7 +2,7 @@ use bincode::Encode;
 use bincode::enc::Encoder;
 use bincode::error::EncodeError;
 use crate::neoi64::NEOi64;
-
+#[derive(Debug)]
 pub struct UserAgent(String);
 
 impl Encode for UserAgent {
