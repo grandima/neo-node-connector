@@ -21,12 +21,11 @@ impl Encode for Message {
     fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), EncodeError> {
         Encode::encode(&self.flags, encoder)?;
         Encode::encode(&self.command, encoder)?;
-        Encode::encode(&self.payload, encoder)?;
         let mut payload_vec: Vec<u8> = Vec::new();
-        let data = VersionPayload::new();
-        let v = bincode::encode_to_vec(data, bincode::config::standard().with_fixed_int_encoding()).unwrap();
-        Encode::encode(&NEOi64::from(v.len() as i64), encoder)?;
-        v.iter().for_each(|item|{_ = Encode::encode(item, encoder);});
+        _ = bincode::encode_into_std_write(&self.payload, &mut payload_vec, *encoder.config()).unwrap();
+        Encode::encode(&NEOi64::from(payload_vec.len() as i64), encoder)?;
+        payload_vec.iter().for_each(|item|{_ = Encode::encode(item, encoder);});
+
         Ok(())
     }
 }
