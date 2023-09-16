@@ -33,36 +33,3 @@ impl Encode for CapabilityType {
         Ok(())
     }
 }
-// pub struct ServerCapability {
-//
-//     port: u16
-// }
-// const TCP_SERVER: ServerCapability = ServerCapability {neo_type: 1, port: 10333 };
-// const WS_SERVER: ServerCapability = ServerCapability {neo_type: 1, port: 10334 };
-//
-// impl Encode for ServerCapability {
-//     fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), EncodeError> {
-//         Encode::encode(&self.neo_type, encoder)?;
-//         Encode::encode(&self.port, encoder)?;
-//         Ok(())
-//     }
-// }
-
-pub struct FullCapability {
-    neo_type: u8,
-    start_height: u32
-}
-
-impl FullCapability {
-    pub fn new() -> Self {
-        Self{neo_type: 16, start_height: 27691}
-    }
-}
-
-impl Encode for FullCapability {
-    fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), EncodeError> {
-        Encode::encode(&self.neo_type, encoder)?;
-        Encode::encode(&self.start_height, encoder)?;
-        Ok(())
-    }
-}
