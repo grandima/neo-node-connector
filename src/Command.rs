@@ -6,7 +6,7 @@ use bincode::error::{DecodeError, EncodeError};
 use bincode::enc::Encoder;
 
 #[repr(u8)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Command {
     Version,
     Verack

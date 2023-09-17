@@ -3,6 +3,7 @@ use crate::VersionPayload::VersionPayload;
 use bincode::{Decode, Encode};
 use bincode::de::Decoder;
 use bincode::error::{DecodeError, EncodeError};
+use crate::Capability::CapabilityType::Server;
 use crate::Command::Command;
 use crate::neoi64::NEOi64;
 
@@ -10,11 +11,15 @@ const PAYLOAD_MAX_SIZE: usize = 0x02000000;
 #[derive(Debug)]
 pub struct Message {
     flags: u8,
-    command: Command,
-    payload: VersionPayload
+    pub(crate) command: Command,
+    pub(crate) payload: VersionPayload
 }
 
 impl Message {
+    pub fn new(command: Command) -> Self {
+        println!("Sending Message: {:?}", command);
+        Self {flags: 0, command, payload: VersionPayload::default()}
+    }
     pub fn try_deserialize(data: &[u8]) -> (Option<Message>, i32) {
         if data.len() < 3 {
             return (None, 0);
@@ -52,9 +57,15 @@ impl Message {
             return (None, 0);
         }
         match Command::try_from(header[1]) {
-            Ok(command) => (Some(Message { flags, command, payload: VersionPayload::default() }), length as i32),
+            Ok(command) => {
+                println!("Received message: {:?}", command);
+                (Some(Message { flags, command, payload: VersionPayload::default() }), length as i32)
+            },
             _ => (None, 0)
         }
+    }
+    pub fn command(&self) -> &Command {
+        &self.command
     }
 }
 
