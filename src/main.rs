@@ -71,23 +71,5 @@ async fn main() -> Result<(), Box<dyn Error>> {
     })
     .await
     .unwrap();
-    //
-    // let write_task = tokio::spawn(async move {
-    //    let mut stream = TcpStream::connect("127.0.0.1:11333").await.unwrap();
-    //    loop {
-    //       match recv.recv().await {
-    //          Some(message) => {
-    //             let mut config = bincode::config::standard().with_fixed_int_encoding();
-    //             let v = bincode::encode_to_vec(message, config).unwrap();
-    //             match stream.write(&v).await {
-    //                Ok(size) => {println!("sent: {:?}", size);},
-    //                Err(error) => {println!("{:?}", error);}
-    //             };
-    //          }
-    //          _ => {}
-    //       };
-    //    }
-    // });
-    // tokio::join!(read_task, write_task);
     Ok(())
 }
