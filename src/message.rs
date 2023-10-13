@@ -1,24 +1,28 @@
-use bincode::enc::Encoder;
-use crate::VersionPayload::VersionPayload;
-use bincode::{Decode, Encode};
-use bincode::de::Decoder;
-use bincode::error::{DecodeError, EncodeError};
-use crate::Capability::CapabilityType::Server;
-use crate::Command::Command;
+use crate::capability::CapabilityType::Server;
+use crate::command::Command;
 use crate::neoi64::NEOi64;
+use crate::version_payload::VersionPayload;
+use bincode::de::Decoder;
+use bincode::enc::Encoder;
+use bincode::error::{DecodeError, EncodeError};
+use bincode::{Decode, Encode};
 
 const PAYLOAD_MAX_SIZE: usize = 0x02000000;
 #[derive(Debug)]
 pub struct Message {
     flags: u8,
     pub(crate) command: Command,
-    pub(crate) payload: VersionPayload
+    pub(crate) payload: VersionPayload,
 }
 
 impl Message {
     pub fn new(command: Command) -> Self {
         println!("Sending Message: {:?}", command);
-        Self {flags: 0, command, payload: VersionPayload::default()}
+        Self {
+            flags: 0,
+            command,
+            payload: VersionPayload::default(),
+        }
     }
     pub fn try_deserialize(data: &[u8]) -> (Option<Message>, i32) {
         if data.len() < 3 {
@@ -33,19 +37,22 @@ impl Message {
             if data.len() < 5 {
                 return (None, 0);
             }
-            length = u16::from_le_bytes(data[payload_index..payload_index + 2].try_into().unwrap()) as usize;
+            length = u16::from_le_bytes(data[payload_index..payload_index + 2].try_into().unwrap())
+                as usize;
             payload_index += 2;
         } else if length == 0xFE {
             if data.len() < 7 {
                 return (None, 0);
             }
-            length = u32::from_le_bytes(data[payload_index..payload_index + 4].try_into().unwrap()) as usize;
+            length = u32::from_le_bytes(data[payload_index..payload_index + 4].try_into().unwrap())
+                as usize;
             payload_index += 4;
         } else if length == 0xFF {
             if data.len() < 11 {
                 return (None, 0);
             }
-            length = u64::from_le_bytes(data[payload_index..payload_index + 8].try_into().unwrap()) as usize;
+            length = u64::from_le_bytes(data[payload_index..payload_index + 8].try_into().unwrap())
+                as usize;
             payload_index += 8;
         }
 
@@ -59,9 +66,16 @@ impl Message {
         match Command::try_from(header[1]) {
             Ok(command) => {
                 println!("Received message: {:?}", command);
-                (Some(Message { flags, command, payload: VersionPayload::default() }), length as i32)
-            },
-            _ => (None, 0)
+                (
+                    Some(Message {
+                        flags,
+                        command,
+                        payload: VersionPayload::default(),
+                    }),
+                    length as i32,
+                )
+            }
+            _ => (None, 0),
         }
     }
     pub fn command(&self) -> &Command {
@@ -71,7 +85,11 @@ impl Message {
 
 impl Default for Message {
     fn default() -> Self {
-        Self {flags: 0, command: Command::Version, payload: VersionPayload::default()}
+        Self {
+            flags: 0,
+            command: Command::Version,
+            payload: VersionPayload::default(),
+        }
     }
 }
 
@@ -79,7 +97,11 @@ impl Decode for Message {
     fn decode<D: Decoder>(decoder: &mut D) -> Result<Self, DecodeError> {
         let flags: u8 = Decode::decode(decoder)?;
         let command: Command = Decode::decode(decoder)?;
-        Ok(Self{flags, command, payload: VersionPayload::default()})
+        Ok(Self {
+            flags,
+            command,
+            payload: VersionPayload::default(),
+        })
     }
 }
 
@@ -88,10 +110,12 @@ impl Encode for Message {
         Encode::encode(&self.flags, encoder)?;
         Encode::encode(&self.command, encoder)?;
         let mut payload_vec: Vec<u8> = Vec::new();
-        _ = bincode::encode_into_std_write(&self.payload, &mut payload_vec, *encoder.config()).unwrap();
+        _ = bincode::encode_into_std_write(&self.payload, &mut payload_vec, *encoder.config())
+            .unwrap();
         Encode::encode(&NEOi64::from(payload_vec.len() as i64), encoder)?;
-        payload_vec.iter().for_each(|item|{_ = Encode::encode(item, encoder);});
+        payload_vec.iter().for_each(|item| {
+            _ = Encode::encode(item, encoder);
+        });
         Ok(())
     }
 }
-

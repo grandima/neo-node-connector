@@ -1,13 +1,16 @@
-mod Capability;
-mod Command;
-mod Message;
-mod VersionPayload;
+mod capability;
+mod command;
+mod message;
 mod neoi64;
 mod user_agent;
+mod version_payload;
 
 use bincode::enc::EncoderImpl;
 use bincode::Encode;
+use command::*;
+use command::*;
 use log::info;
+use message::Message as NEOMessage;
 use std::error::Error;
 use std::hash::Hash;
 use std::{io, result};
@@ -16,9 +19,7 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::{mpsc, oneshot};
 use tokio::time::*;
 use tokio_native_tls::{native_tls, TlsConnector};
-use Command::*;
-use Message::Message as NEOMessage;
-async fn write(stream: &mut TcpStream, message: Message::Message) -> io::Result<usize> {
+async fn write(stream: &mut TcpStream, message: message::Message) -> io::Result<usize> {
     let config = bincode::config::standard().with_fixed_int_encoding();
     let v = bincode::encode_to_vec(message, config).unwrap();
     stream.write(&v).await
@@ -57,12 +58,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
          };
             _ = buffer.drain(0..length as usize);
             match message.command() {
-                Command::Command::Version => {
-                    let result =
-                        write(&mut stream, Message::Message::new(Command::Command::Verack)).await;
+                Command::Version => {
+                    let result = write(&mut stream, message::Message::new(Command::Verack)).await;
                     print_result(&result);
                 }
-                Command::Command::Verack => {
+                Command::Verack => {
                     println!("Received Verack!!");
                 }
                 _ => {}
