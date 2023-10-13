@@ -39,7 +39,7 @@ impl Encode for VersionPayload {
         Encode::encode(&self.timestamp, encoder)?;
         Encode::encode(&self.nonce, encoder)?;
         Encode::encode(&self.user_agent, encoder)?;
-        let len = (self.capabilities.len() as i64);
+        let len = self.capabilities.len() as i64;
         Encode::encode(&NEOi64::from(len), encoder)?;
         self.capabilities.iter().for_each(|item| {
             _ = Encode::encode(item, encoder);

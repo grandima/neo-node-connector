@@ -1,4 +1,4 @@
-use crate::capability::CapabilityType::Server;
+
 use crate::command::Command;
 use crate::neoi64::NEOi64;
 use crate::version_payload::VersionPayload;
@@ -59,7 +59,7 @@ impl Message {
         if length > PAYLOAD_MAX_SIZE {
             return (None, -1);
         }
-        length = length + payload_index;
+        length += payload_index;
         if data.len() < length {
             return (None, 0);
         }

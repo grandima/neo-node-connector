@@ -28,6 +28,6 @@ impl Encode for NEOi64 {
 
 impl From<i64> for NEOi64 {
     fn from(value: i64) -> Self {
-        Self{0: value}
+        Self(value)
     }
 }

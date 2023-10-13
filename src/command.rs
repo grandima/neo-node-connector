@@ -1,5 +1,5 @@
-use std::backtrace::BacktraceStatus::Captured;
-use std::ops::Deref;
+
+
 use bincode::{Decode, Encode};
 use bincode::de::Decoder;
 use bincode::error::{DecodeError, EncodeError};
@@ -33,6 +33,6 @@ impl Encode for Command {
 impl Decode for Command {
     fn decode<D: Decoder>(decoder: &mut D) -> Result<Self, DecodeError> {
         let value: u8 = Decode::decode(decoder)?;
-        Command::try_from(value).map_err(|e| DecodeError::OtherString(e))
+        Command::try_from(value).map_err(DecodeError::OtherString)
     }
 }
